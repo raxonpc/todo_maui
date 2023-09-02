@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="todo_maui.MainPage"
+             xmlns:vm="clr-namespace:todo_maui.ViewModel">
+
+    <ContentPage.BindingContext>
+        <vm:TasksVM />
+    </ContentPage.BindingContext>
+
+    <VerticalStackLayout
+        Spacing="25"
+            >
+
+        <FlexLayout
+                Direction="Row"
+                JustifyContent="SpaceEvenly">
+
+            <Entry x:Name="taskTitleEntry"
+                   Placeholder="Enter task title"
+                   FlexLayout.Grow="3"
+                       />
+
+            <Entry x:Name="taskDescriptionEntry"
+                   Placeholder="Enter task description"
+                   FlexLayout.Grow="3"
+                       />
+
+            <Button Text="Create task"
+                    Clicked="onTaskButtonClicked"
+                    FlexLayout.Grow="2">
+
+                <!-- Fancy button animations when pressed/hovered over -->
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="White" />
+                                    <Setter Property="Scale" Value="1" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="PointerOver">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="LightGray" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Property="Scale" Value="0.8" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </VisualStateManager.VisualStateGroups>
+            </Button>
+
+        </FlexLayout>
+        <Label
+            IsVisible="{Binding IsErrorMsgShown}"
+            Text="Title cannot be empty!"
+            TextColor="Red"
+            HorizontalTextAlignment="Center">
+            <Label.BindingContext>
+            </Label.BindingContext>
+        </Label>
+
+        <Editor x:Name="tasksEditor"
+                Placeholder="Here will your tasks sit"
+                HeightRequest="500"
+                IsReadOnly="True"
+                Text="{Binding TasksFormatted}"/>
+    </VerticalStackLayout>
+
+</ContentPage>
