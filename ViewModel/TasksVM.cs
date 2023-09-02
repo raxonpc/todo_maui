@@ -8,21 +8,39 @@ using System.Threading.Tasks;
 namespace todo_maui.ViewModel
 {
     using Model;
+    using System.Windows.Input;
 
     public class TasksVM : INotifyPropertyChanged
     {
         private readonly Model.TaskList tasks = Settings.Load();
-        private bool isErrorMsgShown = false;
+        private bool hasError = false;
 
-        public bool IsErrorMsgShown
+        private ICommand addCommand;
+        public ICommand Add
         {
-            get { return isErrorMsgShown; }
-            private set { isErrorMsgShown = value; }
+            get
+            {
+                if (addCommand == null) addCommand = new AddCommand(this);
+
+                return addCommand;
+            }
+        }
+
+        public bool HasError
+        {
+            get { return hasError; }
+            set
+            {
+                if (hasError == value) return;
+
+                hasError = value;
+                onPropertyChanged(nameof(HasError));
+            }
         }
 
         public TasksVM()
         {
-            Application.Current.Windows.First().Deactivated += (object sender, EventArgs e) => { Settings.Save(tasks); };
+            Application.Current.Windows.First().Destroying += (object sender, EventArgs e) => { Settings.Save(tasks); };
         }
 
         public List<Types.Task> Tasks
@@ -37,6 +55,11 @@ namespace todo_maui.ViewModel
 
         public void AddTask(Types.Task task)
         {
+            if (task == null || task.Title == null || task.Title.Length == 0)
+            {
+                HasError = true;
+                return;
+            }
             tasks.AddTask(task);
             onPropertyChanged(nameof(Tasks));
         }
@@ -51,20 +74,6 @@ namespace todo_maui.ViewModel
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
                 }
-            }
-        }
-
-        public string TasksFormatted
-        {
-            get
-            {
-                StringBuilder formattedTasks = new StringBuilder();
-                foreach (var task in Tasks)
-                {
-                    formattedTasks.AppendLine($"Title: {task.Title}; Description: {task.Description}");
-                    formattedTasks.AppendLine(); // Add a newline to separate tasks
-                }
-                return formattedTasks.ToString();
             }
         }
     }

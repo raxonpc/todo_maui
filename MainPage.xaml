@@ -2,11 +2,16 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="todo_maui.MainPage"
+             xmlns:local="clr-namespace:todo_maui"
              xmlns:vm="clr-namespace:todo_maui.ViewModel">
 
     <ContentPage.BindingContext>
         <vm:TasksVM />
     </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <local:TaskListToString x:Key="tl2s" />
+        <local:StringsToTask x:Key="s2t" />
+    </ContentPage.Resources>
 
     <VerticalStackLayout
         Spacing="25"
@@ -28,7 +33,17 @@
 
             <Button Text="Create task"
                     Clicked="onTaskButtonClicked"
-                    FlexLayout.Grow="2">
+                    FlexLayout.Grow="2"
+                    Command="{Binding Add}">
+
+                <Button.CommandParameter>
+                    <MultiBinding Converter="{StaticResource s2t}">
+                        <MultiBinding.Bindings>
+                            <Binding Path="Text" Source="{x:Reference taskTitleEntry}" />
+                            <Binding Path="Text" Source="{x:Reference taskDescriptionEntry}"/>
+                        </MultiBinding.Bindings>
+                    </MultiBinding>
+                </Button.CommandParameter>
 
                 <!-- Fancy button animations when pressed/hovered over -->
                 <VisualStateManager.VisualStateGroups>
@@ -57,11 +72,12 @@
 
         </FlexLayout>
         <Label
-            IsVisible="{Binding IsErrorMsgShown}"
+            IsVisible="{Binding HasError}"
             Text="Title cannot be empty!"
             TextColor="Red"
             HorizontalTextAlignment="Center">
             <Label.BindingContext>
+                <vm:TasksVM />
             </Label.BindingContext>
         </Label>
 
@@ -69,7 +85,7 @@
                 Placeholder="Here will your tasks sit"
                 HeightRequest="500"
                 IsReadOnly="True"
-                Text="{Binding TasksFormatted}"/>
+                Text="{Binding Tasks, Converter={StaticResource tl2s}}"/>
     </VerticalStackLayout>
 
 </ContentPage>

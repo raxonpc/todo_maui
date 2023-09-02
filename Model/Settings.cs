@@ -35,9 +35,6 @@ namespace todo_maui.Model
                         new XElement("description", task.Description)));
             }
 
-            var file = new StreamWriter("C:\\Users\\tomec\\OneDrive\\Pulpit\\" + "TEMPaaa.TXT");
-            file.WriteLine(SettingsFilePath);
-            file.Close();
             xml.Save(SettingsFilePath);
         }
 
